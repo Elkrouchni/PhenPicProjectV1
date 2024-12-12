@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Before and After Slider</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    header, footer {
+      text-align: center;
+      padding: 10px;
+      background: #f4f4f4;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .slider-container {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+    }
+    .slider-container img {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      height: auto;
+    }
+    .slider-container .before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      clip-path: inset(0);
+    }
+    .slider-container .after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      clip-path: inset(0 50% 0 0);
+    }
+    .slider-container .handle {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 10px;
+      height: 100%;
+      background: #fff;
+      cursor: ew-resize;
+      z-index: 3;
+    }
+    .slider-container .before-info,
+    .slider-container .after-info,
+    .slider-container .date-difference {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 2rem;
+      font-weight: bold;
+      z-index: 4;
+    }
+    .slider-container .before-info,
+    .slider-container .after-info {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .slider-container .before-info {
+      left: calc(50% - 5px);
+      transform: translateX(-150%) translateY(-50%);
+    }
+    .slider-container .after-info {
+      left: calc(50% + 5px);
+      transform: translateX(50%) translateY(-50%);
+    }
+    .slider-container .date-difference {
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+    }
+    .controls {
+      margin-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Before and After Slider</h1>
+  </header>
+  <main>
+    <div class="slider-container" id="sliderContainer">
+      <img src="before.jpg" alt="Before Image" class="before" id="beforeImage">
+      <img src="after.jpg" alt="After Image" class="after" id="afterImage">
+      <div class="handle" id="handle"></div>
+      <div class="before-info" id="beforeExif">Before Date</div>
+      <div class="after-info" id="afterExif">After Date</div>
+      <div class="date-difference" id="dateDifference">Difference: N/A</div>
+    </div>
+    <div class="controls">
+      <label>Before Image: <input type="file" id="beforeInput" accept="image/*"></label>
+      <label>After Image: <input type="file" id="afterInput" accept="image/*"></label>
+    </div>
+  </main>
+  <footer>
+    <p>© 2024 Before and After Slider</p>
+  </footer>
+  <script>
+    const sliderContainer = document.getElementById('sliderContainer');
+    const handle = document.getElementById('handle');
+    const beforeImage = document.getElementById('beforeImage');
+    const afterImage = document.getElementById('afterImage');
+    const beforeInput = document.getElementById('beforeInput');
+    const afterInput = document.getElementById('afterInput');
+    const beforeExif = document.getElementById('beforeExif');
+    const afterExif = document.getElementById('afterExif');
+    const dateDifference = document.getElementById('dateDifference');
+
+    let beforeDate = null;
+    let afterDate = null;
+    let isDragging = false;
+
+    sliderContainer.addEventListener('mousedown', (e) => {
+      isDragging = true;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const rect = sliderContainer.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      if (x < 0) x = 0;
+      if (x > rect.width) x = rect.width;
+      handle.style.left = `${x}px`;
+      afterImage.style.clipPath = `inset(0 ${rect.width - x}px 0 0)`;
+      beforeExif.style.left = `${x - 5}px`;
+      afterExif.style.left = `${x + 5}px`;
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    function calculateDateDifference(date1, date2) {
+      if (date1 && date2) {
+        const diffTime = Math.abs(date2 - date1);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        dateDifference.textContent = `Difference: ${diffDays} day(s)`;
+      } else {
+        dateDifference.textContent = "Difference: N/A";
+      }
+    }
+
+    function parseExifDate(dateString) {
+      const [date, time] = dateString.split(" ");
+      const [year, month, day] = date.split(":");
+      return new Date(year, month - 1, day);
+    }
+
+    function loadExifData(file, imgElement, exifElement, isBefore) {
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const dataUrl = e.target.result;
+          imgElement.src = dataUrl;
+          imgElement.onload = () => {
+            sliderContainer.style.width = `${imgElement.naturalWidth}px`;
+            sliderContainer.style.height = `${imgElement.naturalHeight}px`;
+          };
+          const jsExif = window.piexif;
+          if (jsExif) {
+            const exifData = jsExif.load(reader.result);
+            const dateTime = exifData["0th"][piexif.ImageIFD.DateTime] || "Unknown Date";
+            exifElement.textContent = `Taken on: ${dateTime}`;
+            if (dateTime !== "Unknown Date") {
+              const parsedDate = parseExifDate(dateTime);
+              if (isBefore) {
+                beforeDate = parsedDate;
+              } else {
+                afterDate = parsedDate;
+              }
+              calculateDateDifference(beforeDate, afterDate);
+            }
+          } else {
+            exifElement.textContent = "EXIF data not available";
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    beforeInput.addEventListener('change', (e) => {
+      loadExifData(e.target.files[0], beforeImage, beforeExif, true);
+    });
+
+    afterInput.addEventListener('change', (e) => {
+      loadExifData(e.target.files[0], afterImage, afterExif, false);
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/piexifjs"></script>
+</body>
+</html>
