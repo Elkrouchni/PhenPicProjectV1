@@ -11,20 +11,40 @@
       padding: 0;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      height: 100vh;
+      min-height: 100vh;
       box-sizing: border-box;
     }
     header, footer {
       text-align: center;
       padding: 10px;
       background: #f4f4f4;
+      flex-shrink: 0;
     }
     main {
       flex: 1;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .view-mode {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .view-mode button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    .view-mode button:hover {
+      background-color: #0056b3;
     }
     .slider-container {
       position: relative;
@@ -33,6 +53,7 @@
       width: 100%;
       max-width: 600px;
       height: auto;
+      margin: 0 auto;
     }
     .slider-container img {
       display: block;
@@ -122,6 +143,10 @@
     <h1>Before and After Slider</h1>
   </header>
   <main>
+    <div class="view-mode">
+      <button id="desktopView">Desktop View</button>
+      <button id="mobileView">Mobile View</button>
+    </div>
     <div class="slider-container" id="sliderContainer">
       <img src="before.jpg" alt="Before Image" class="before" id="beforeImage">
       <img src="after.jpg" alt="After Image" class="after" id="afterImage">
@@ -148,6 +173,16 @@
     const beforeExif = document.getElementById('beforeExif');
     const afterExif = document.getElementById('afterExif');
     const dateDifference = document.getElementById('dateDifference');
+
+    document.getElementById('desktopView').addEventListener('click', () => {
+      document.body.style.maxWidth = "1200px";
+      document.body.style.margin = "0 auto";
+    });
+
+    document.getElementById('mobileView').addEventListener('click', () => {
+      document.body.style.maxWidth = "100%";
+      document.body.style.margin = "0";
+    });
 
     let beforeDate = null;
     let afterDate = null;
