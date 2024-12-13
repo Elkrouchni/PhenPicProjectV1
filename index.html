@@ -3,143 +3,152 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Before and After Slider</title>
+  <title>Responsive Before and After Slider</title>
   <style>
+    :root {
+      --primary-color: #007bff;
+      --secondary-color: #f4f4f4;
+      --text-color: #333;
+      --highlight-color: rgba(255, 255, 255, 0.8);
+    }
+
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
+      font-family: Arial, sans-serif;
+      color: var(--text-color);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      box-sizing: border-box;
+      background: var(--secondary-color);
     }
+
     header, footer {
       text-align: center;
-      padding: 10px;
-      background: #f4f4f4;
-      flex-shrink: 0;
+      padding: 15px;
+      background: var(--primary-color);
+      color: white;
+      font-size: 1.2rem;
     }
+
     main {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      padding: 10px;
+      justify-content: center;
+      padding: 20px;
     }
-    .view-mode {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .view-mode button {
-      padding: 8px 16px;
-      font-size: 0.9rem;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background-color: #007bff;
-      color: white;
-      transition: background-color 0.3s;
-    }
-    .view-mode button:hover {
-      background-color: #0056b3;
-    }
+
     .slider-container {
       position: relative;
-      display: inline-block;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+      aspect-ratio: 16/9;
+      margin-bottom: 20px;
       overflow: hidden;
-      width: 100%;
-      max-width: 400px;
-      height: auto;
-      margin: 0 auto 10px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background: #ddd;
     }
+
     .slider-container img {
-      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: cover;
     }
-    .slider-container .before {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-      clip-path: inset(0);
-    }
+
     .slider-container .after {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2;
       clip-path: inset(0 50% 0 0);
     }
+
     .slider-container .handle {
       position: absolute;
       top: 0;
       left: 50%;
-      width: 10px;
+      transform: translateX(-50%);
+      width: 5px;
       height: 100%;
-      background: #fff;
+      background: var(--primary-color);
       cursor: ew-resize;
-      z-index: 3;
     }
-    .slider-container .before-info,
-    .slider-container .after-info,
-    .slider-container .date-difference {
+
+    .slider-container .info {
       position: absolute;
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 4px 8px;
-      border-radius: 5px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      z-index: 4;
-    }
-    .slider-container .before-info,
-    .slider-container .after-info {
-      top: 50%;
-      transform: translateY(-50%);
-    }
-    .slider-container .before-info {
-      left: calc(50% - 5px);
-      transform: translateX(-150%) translateY(-50%);
-    }
-    .slider-container .after-info {
-      left: calc(50% + 5px);
-      transform: translateX(50%) translateY(-50%);
-    }
-    .slider-container .date-difference {
-      top: 5px;
+      bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 5;
+      background: var(--highlight-color);
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      font-weight: bold;
     }
+
+    .slider-container .date-label {
+      position: absolute;
+      top: 10px;
+      color: white;
+      font-size: 0.9rem;
+      font-weight: bold;
+      background: var(--primary-color);
+      padding: 5px 10px;
+      border-radius: 5px;
+      z-index: 10;
+    }
+
+    .slider-container .before-date {
+      left: 10px;
+    }
+
+    .slider-container .after-date {
+      right: 10px;
+    }
+
     .controls {
+      width: 100%;
+      max-width: 600px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
     }
+
     .controls label {
-      font-size: 0.9rem;
+      flex: 1 1 45%;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 10px;
+      border: 1px solid var(--primary-color);
+      border-radius: 5px;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
     }
-    @media screen and (max-width: 768px) {
-      header, footer {
-        font-size: 0.8rem;
-      }
+
+    .controls label:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .controls input {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
       .slider-container {
-        max-width: 100%;
-        height: auto;
+        max-width: 90%;
       }
-      .slider-container .before-info,
-      .slider-container .after-info,
-      .slider-container .date-difference {
-        font-size: 0.7rem;
-        padding: 2px 5px;
+      .controls label {
+        flex: 1 1 100%;
       }
     }
   </style>
@@ -149,146 +158,107 @@
     <h1>Before and After Slider</h1>
   </header>
   <main>
-    <div class="view-mode">
-      <button id="desktopView">Desktop View</button>
-      <button id="mobileView">Mobile View</button>
-    </div>
     <div class="slider-container" id="sliderContainer">
       <img src="before.jpg" alt="Before Image" class="before" id="beforeImage">
       <img src="after.jpg" alt="After Image" class="after" id="afterImage">
       <div class="handle" id="handle"></div>
-      <div class="before-info" id="beforeExif">Before Date</div>
-      <div class="after-info" id="afterExif">After Date</div>
-      <div class="date-difference" id="dateDifference">Difference: N/A</div>
+      <div class="info" id="dateDifference">Slide to compare</div>
+      <div class="date-label before-date" id="beforeDateLabel">Before: N/A</div>
+      <div class="date-label after-date" id="afterDateLabel">After: N/A</div>
     </div>
     <div class="controls">
-      <label>Before Image: <input type="file" id="beforeInput" accept="image/*"></label>
-      <label>After Image: <input type="file" id="afterInput" accept="image/*"></label>
+      <label>Before Image
+        <input type="file" id="beforeInput" accept="image/*">
+      </label>
+      <label>After Image
+        <input type="file" id="afterInput" accept="image/*">
+      </label>
     </div>
   </main>
   <footer>
-    <p>© 2024 Before and After Slider</p>
+    <p>&copy; 2024 Before and After Slider</p>
   </footer>
+  <script src="https://cdn.jsdelivr.net/npm/piexifjs"></script>
   <script>
     const sliderContainer = document.getElementById('sliderContainer');
     const handle = document.getElementById('handle');
-    const beforeImage = document.getElementById('beforeImage');
     const afterImage = document.getElementById('afterImage');
-    const beforeInput = document.getElementById('beforeInput');
-    const afterInput = document.getElementById('afterInput');
-    const beforeExif = document.getElementById('beforeExif');
-    const afterExif = document.getElementById('afterExif');
+    const beforeDateLabel = document.getElementById('beforeDateLabel');
+    const afterDateLabel = document.getElementById('afterDateLabel');
     const dateDifference = document.getElementById('dateDifference');
 
-    document.getElementById('desktopView').addEventListener('click', () => {
-      document.body.style.maxWidth = "1200px";
-      document.body.style.margin = "0 auto";
-    });
-
-    document.getElementById('mobileView').addEventListener('click', () => {
-      document.body.style.maxWidth = "100%";
-      document.body.style.margin = "0";
-    });
-
+    let isDragging = false;
     let beforeDate = null;
     let afterDate = null;
-    let isDragging = false;
-
-    const updateSlider = (x, rect) => {
-      if (x < 0) x = 0;
-      if (x > rect.width) x = rect.width;
-      handle.style.left = `${x}px`;
-      afterImage.style.clipPath = `inset(0 ${rect.width - x}px 0 0)`;
-      beforeExif.style.left = `${x - 5}px`;
-      afterExif.style.left = `${x + 5}px`;
-    };
 
     sliderContainer.addEventListener('mousedown', (e) => {
-      isDragging = true;
-    });
-
-    sliderContainer.addEventListener('touchstart', (e) => {
       isDragging = true;
     });
 
     window.addEventListener('mousemove', (e) => {
       if (!isDragging) return;
       const rect = sliderContainer.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      updateSlider(x, rect);
-    });
-
-    window.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const rect = sliderContainer.getBoundingClientRect();
-      const x = e.touches[0].clientX - rect.left;
-      updateSlider(x, rect);
+      let x = e.clientX - rect.left;
+      if (x < 0) x = 0;
+      if (x > rect.width) x = rect.width;
+      handle.style.left = `${x}px`;
+      afterImage.style.clipPath = `inset(0 ${rect.width - x}px 0 0)`;
     });
 
     window.addEventListener('mouseup', () => {
       isDragging = false;
     });
 
-    window.addEventListener('touchend', () => {
-      isDragging = false;
-    });
+    function extractExifDate(dataUrl) {
+      const exif = piexif.load(dataUrl);
+      const dateTime = exif["0th"][piexif.ImageIFD.DateTime];
+      if (dateTime) {
+        const [date, time] = dateTime.split(" ");
+        const [year, month, day] = date.split(":");
+        return new Date(year, month - 1, day);
+      }
+      return null;
+    }
 
-    function calculateDateDifference(date1, date2) {
-      if (date1 && date2) {
-        const diffTime = Math.abs(date2 - date1);
+    function updateDateDifference() {
+      if (beforeDate && afterDate) {
+        const diffTime = Math.abs(afterDate - beforeDate);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         dateDifference.textContent = `Difference: ${diffDays} day(s)`;
       } else {
-        dateDifference.textContent = "Difference: N/A";
+        dateDifference.textContent = "Slide to compare";
       }
     }
 
-    function parseExifDate(dateString) {
-      const [date, time] = dateString.split(" ");
-      const [year, month, day] = date.split(":");
-      return new Date(year, month - 1, day);
-    }
-
-    function loadExifData(file, imgElement, exifElement, isBefore) {
+    document.getElementById('beforeInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = function (e) {
-          const dataUrl = e.target.result;
-          imgElement.src = dataUrl;
-          imgElement.onload = () => {
-            sliderContainer.style.width = "100%";
-            sliderContainer.style.height = "auto";
-          };
-          const jsExif = window.piexif;
-          if (jsExif) {
-            const exifData = jsExif.load(reader.result);
-            const dateTime = exifData["0th"][piexif.ImageIFD.DateTime] || "Unknown Date";
-            exifElement.textContent = `Taken on: ${dateTime}`;
-            if (dateTime !== "Unknown Date") {
-              const parsedDate = parseExifDate(dateTime);
-              if (isBefore) {
-                beforeDate = parsedDate;
-              } else {
-                afterDate = parsedDate;
-              }
-              calculateDateDifference(beforeDate, afterDate);
-            }
-          } else {
-            exifElement.textContent = "EXIF data not available";
-          }
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+          document.getElementById('beforeImage').src = dataUrl;
+          beforeDate = extractExifDate(dataUrl) || file.lastModifiedDate || null;
+          beforeDateLabel.textContent = beforeDate ? `Before: ${beforeDate.toDateString()}` : 'Before: N/A';
+          updateDateDifference();
         };
         reader.readAsDataURL(file);
       }
-    }
-
-    beforeInput.addEventListener('change', (e) => {
-      loadExifData(e.target.files[0], beforeImage, beforeExif, true);
     });
 
-    afterInput.addEventListener('change', (e) => {
-      loadExifData(e.target.files[0], afterImage, afterExif, false);
+    document.getElementById('afterInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+          document.getElementById('afterImage').src = dataUrl;
+          afterDate = extractExifDate(dataUrl) || file.lastModifiedDate || null;
+          afterDateLabel.textContent = afterDate ? `After: ${afterDate.toDateString()}` : 'After: N/A';
+          updateDateDifference();
+        };
+        reader.readAsDataURL(file);
+      }
     });
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/piexifjs"></script>
 </body>
 </html>
